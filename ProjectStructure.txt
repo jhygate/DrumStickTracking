@@ -1,0 +1,6 @@
+1. Get video from user
+    Video is user playing to a metrenome of known bpm, the time of the first note of the first bar is known
+2. Analyse video
+    Track sticks, find hits (check whihc durm hit)
+    return list of frames and what drum hit on frame
+3.create sheet music
