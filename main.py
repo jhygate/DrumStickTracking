@@ -9,14 +9,14 @@ import unityStuff
 import math
 from threading import Thread
 
-videoPath = 'Videos/ABOVEHIHAT.mp4'
+videoPath = 'Videos/ABOVETRIM.mp4'
 calibrationPath = 'calibration.yml'
 imageWidth = 500
 
 CAM,DIST = calibration.load_coefficients(calibrationPath)
 
-redHSVRange = HSVRange(np.array([127,71,71]),np.array([255,255,255]))
-# redHSVRange = HSVRange(np.array([100,140,30]),np.array([140,250,255])) #above trim
+# redHSVRange = HSVRange(np.array([127,71,71]),np.array([255,255,255]))
+redHSVRange = HSVRange(np.array([100,140,30]),np.array([140,250,255])) #above trim
 # redHSVRange = HSVRange(np.array([50,50,0]),np.array([140,250,255]))
 
 
@@ -28,6 +28,8 @@ oldPeaks = None
 
 from pydub import AudioSegment
 from pydub.playback import play
+
+
 def playSound():
     song = AudioSegment.from_wav('bassShort.wav')
     play(song)
@@ -43,6 +45,7 @@ while frame is not None:
     frameNum+=1
     redBlobs = cameraHelpers.getPossibleMarkers(frame,redHSVRange)
     lineSets = cameraHelpers.get_hough_sets(redBlobs,frame)
+    print(len(lineSets))
     linesetFrame = cameraHelpers.draw_hough_sets(frame,lineSets)
     cv2.imshow('lineSets',linesetFrame)
 
@@ -104,7 +107,7 @@ while frame is not None:
                 indexVals.append(foundPointIndex)
                 positions.append(newMarkerPositions[foundPointIndex])
 
-        stick = cameraHelpers.getEstimatedPosition(indexVals,positions)
+        ret,stick = cameraHelpers.getEstimatedPosition(indexVals,positions)
 
         for position in positions:
             cv2.circle(frame,position,5,(100,90,90),-1)

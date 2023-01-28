@@ -66,10 +66,15 @@ def get_hough_sets(markerPoints:list,frame:np.ndarray) -> List[List[List[int]]]:
     for marker in markerPoints: 
         cX,cY = marker
         blank_image[cY][cX] = 255
+    
 
-    lines = cv2.HoughLines(blank_image, 1, np.pi/180, 3)
+
+    lines = cv2.HoughLines(blank_image, 2, np.pi/180,3)
+    
     if lines is not None:
-        pass
+        print('len lines',len(lines))
+    else:
+        print('Hough lines in None')
 
     lineSets = []
     if lines is not None:
@@ -141,9 +146,81 @@ def withinRange(value,target,threshold):
     else:
         return False
 
-def getEstimatedPosition(indices,points):
-    try:
+def closest_point_on_line(model, point):
+    line_pt1 = [0,model(0)]
+    line_pt2 = [1,model(1)]
+    line_vec = np.subtract(line_pt2, line_pt1)
+    point_vec = np.subtract(point, line_pt1)
+    line_unit_vec = line_vec / np.linalg.norm(line_vec)
+    point_on_line = np.dot(point_vec, line_unit_vec) * line_unit_vec
+    closest_point = np.add(line_pt1, point_on_line)
+    return closest_point
 
+def normalize(v):
+    norm = np.linalg.norm(v)
+    if norm == 0: 
+       return v
+    return v / norm
+
+def getEstimatedPosition(indices,points):
+    #Given indices (x val) and points (2D y val) find the points that best match the curve
+    #to ensure curve is a straight line, find MSD line to all points given, and translate points to their closest point on  the line
+    # try:
+
+    try:
+        xPoints = [point[0] for point in points]
+        yPoints = [point[1] for point in points]
+
+        modelx = np.poly1d(np.polyfit(indices,
+                            xPoints, 1))
+
+        modely = np.poly1d(np.polyfit(indices,
+                            yPoints, 1))
+
+        estimatedPosition = []
+        for markerIndex in range(7):
+            x,y = modelx(markerIndex),modely(markerIndex)
+            estimatedPosition.append([int(x),int(y)])
+            
+        print(estimatedPosition,'estpos')
+        return True,estimatedPosition
+    except:
+        return False,[]
+
+
+    # pt0 = [0,modelLinear(0)]
+    # pt1 = linePoints[0]
+
+    # directionVector = normalize(np.subtract(pt1,pt0))
+    # print(directionVector)
+
+    # lineDists = [np.divide(np.subtract(point,pt0)[0],directionVector[0]) for point in linePoints]
+    # print(lineDists,'lineDists')
+
+    # modelQuad = np.poly1d(np.polyfit(indices,
+    #                         lineDists, 2))
+
+    # estimatedPosition = []
+    # for i in range(7):
+    #     pos = np.subtract(pt0,np.multiply(directionVector,modelQuad(i)))
+    #     x = int(pos[0])
+    #     y= int(pos[1])
+    #     estimatedPosition.append([x,y])
+    # print(estimatedPosition,'estPos')
+    # return True,estimatedPosition
+    # # except:
+    # #     return False,[]
+
+
+
+
+
+
+
+
+
+
+    try:
         xPoints = [point[0] for point in points]
         yPoints = [point[1] for point in points]
 

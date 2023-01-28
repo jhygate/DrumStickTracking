@@ -5,6 +5,7 @@ Returns each marker location if all markers are detected in an img
 """
 import cameraHelpers
 import numpy as np
+import markerDetection
 
 def findStick(img,HSVRange,numMarkers=7):
     #Returns Ret,val pair
@@ -12,7 +13,7 @@ def findStick(img,HSVRange,numMarkers=7):
     #Val - list of marker positions
 
     #Get centrePoints of all regions in HSVRange
-    redBlobs = cameraHelpers.getPossibleMarkers(img,HSVRange)
+    redBlobs = markerDetection.getPossibleMarkers(img,HSVRange)
 
     #Get array of possible lines
     #Each line is an array of HSVregion centres that fall on the same line
